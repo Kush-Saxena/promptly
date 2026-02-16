@@ -15,12 +15,26 @@ Also, keeping all custom installed scripts/plugins inside Promptly makes it easi
 
 The trade-off is intentional: the feature set is narrower than a full framework, but the code stays small, predictable, and entirely under your control.
 
+## Directory Structure
+
+```
+scripts/
+├── core/
+│   └── load_my_scripts.sh    # Entry point loader
+├── k8s/
+│   ├── kubectl_aliases.sh    # Kubectl shorthand aliases
+│   ├── kubectl_completion.sh # Kubectl zsh completion
+│   └── kubectl_prompt.sh     # Kubernetes-aware prompt
+└── misc/
+    └── stern_completion.sh   # Stern zsh completion
+```
+
 ## Trying out the setup
 
 For trying out the setup. Source the loader script from your `.zshrc`:
 
 ```sh
-source /path/to/promptly/load_my_scripts.sh
+source /path/to/promptly/scripts/core/load_my_scripts.sh
 ```
 
 ## Installation
@@ -28,19 +42,19 @@ source /path/to/promptly/load_my_scripts.sh
 For installing it to start up everytime with ZSH:
 
 ```sh
-echo "\nsource /path/to/promptly/load_my_scripts.sh" >> ~/.zshrc
+echo "\nsource /path/to/promptly/scripts/core/load_my_scripts.sh" >> ~/.zshrc
 ```
 
 This will automatically load all the other scripts listed below.
 
 ## Scripts
 
-### `load_my_scripts.sh`
+### `scripts/core/load_my_scripts.sh`
 
 Entry point that sources all other scripts in order. It iterates over a list of script paths, checks each exists and is non-empty, and sources it.
 You can Set `PROMPTLY_DISABLE=1` to skip loading all of Promptly entirely without removing it from your `.zshrc`.
 
-### `common_aliases.sh`
+### `scripts/k8s/kubectl_aliases.sh`
 
 Kubectl aliases extracted from the [oh-my-zsh kubectl plugin](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/kubectl) with minor custom changes.
 Provides short aliases for common kubectl operations:
@@ -58,15 +72,15 @@ Provides short aliases for common kubectl operations:
 | Output | `kj` (json + jq), `kjx` (json + fx), `kyq` (yaml + yq) |
 
 
-### `kubectl_completion.sh`
+### `scripts/k8s/kubectl_completion.sh`
 
 Zsh tab-completion for `kubectl`. Generated from `kubectl completion zsh`. Licensed under Apache 2.0 by The Kubernetes Authors.
 
-### `stern_completion.sh`
+### `scripts/misc/stern_completion.sh`
 
 Zsh tab-completion for [stern](https://github.com/stern/stern) (multi-pod log tailing tool). Generated from `stern --completion zsh`.
 
-### `kubectl_prompt.sh`
+### `scripts/k8s/kubectl_prompt.sh`
 
 Customizes the zsh prompt to display the current Kubernetes context and namespace. The prompt format is:
 
@@ -83,7 +97,7 @@ Every script supports a `PROMPTLY_` prefixed environment variable that lets you 
 | Environment Variable | Script it disables |
 |---|---|
 | `PROMPTLY_DISABLE` | `load_my_scripts.sh` (disables all of Promptly) |
-| `PROMPTLY_DISABLE_COMMON_ALIASES` | `common_aliases.sh` |
+| `PROMPTLY_DISABLE_COMMON_ALIASES` | `kubectl_aliases.sh` |
 | `PROMPTLY_DISABLE_KUBECTL_COMPLETION` | `kubectl_completion.sh` |
 | `PROMPTLY_DISABLE_STERN_COMPLETION` | `stern_completion.sh` |
 | `PROMPTLY_DISABLE_KUBE_PROMPT` | `kubectl_prompt.sh` |
@@ -92,7 +106,7 @@ Example disable stern completion:
 
 ```sh
 export PROMPTLY_DISABLE_STERN_COMPLETION=1
-source /path/to/promptly/load_my_scripts.sh
+source /path/to/promptly/scripts/core/load_my_scripts.sh
 ```
 
 ## Reporting Issues
@@ -113,7 +127,7 @@ Contributions are welcome! If you have a script or alias set that you find usefu
 
 1. **Fork** the repository and create a new branch for your feature.
 
-2. **Add your script** create a new `.sh` file in the scripts folder.
+2. **Add your script** create a new `.sh` file in the appropriate subdirectory under `scripts/` (e.g. `scripts/k8s/` for Kubernetes-related scripts, `scripts/misc/` for other tools).
 
 3. **Add a disable switch** at the top of your script, add an early-return guard using a `PROMPTLY_` prefixed environment variable so users can opt out of loading it. Follow the existing convention:
 
@@ -129,7 +143,7 @@ Contributions are welcome! If you have a script or alias set that you find usefu
    ```sh
    scripts_to_load=(
        # ... existing entries ...
-       "$SCRIPT_DIR/scripts/your_script.sh"  # Short description of what it does
+       "$SCRIPTS_DIR/<category>/your_script.sh"  # Short description of what it does
    )
    ```
 
