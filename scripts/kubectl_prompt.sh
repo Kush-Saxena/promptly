@@ -10,15 +10,15 @@ kube_prompt() {
     
     if [[ -n "$context" ]]; then
       namespace=${namespace:-default}
-      echo " ~<k8s>~ $context:$namespace"
+      print -nP " %F{yellow}[%F{cyan}☸ %F{magenta}$context %F{yellow}: %F{blue}$namespace%F{yellow}]%f"
     else
-      echo " ~<k8s> <no-context>"
+      print -nP " %F{yellow}[%F{cyan}☸ %F{red}<no-context>%F{yellow}]%f"
     fi
   fi
 }
 
 setopt PROMPT_SUBST
-PROMPT='%F{cyan}%~%f$(kube_prompt) %F{green}❯%f '
+PROMPT='%F{green}[%F{cyan}%~%F{green}]%f$(kube_prompt) %F{green}❯%f '
 
 
 #Modify the PROMPT to whatever way you want to display the information.
